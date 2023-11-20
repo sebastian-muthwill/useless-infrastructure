@@ -1,0 +1,2 @@
+confluent-kafka
+opensearch-py

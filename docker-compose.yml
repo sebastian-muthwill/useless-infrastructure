@@ -1,50 +1,42 @@
 version: '3'
 services:
-  # Django container is the heart of the useless-infrastructure    
-  # Postgres Database
-  postgress-django:
-    image: postgres
-    container_name: postgress-django
-    volumes:
-      - ./data/postgress:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=uselesspostgres
-    networks:
-      - useless-net
-  # Django
-  django:
-    build: ./django
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ./django:/code
-    ports:
-      - "8000:8000"
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=uselesspostgres
-    depends_on:
-      - postgress-django
-    networks:
-      - useless-net
-  # Kafka is used for messaging queues because why not
   kafka:
-    image: 'bitnami/kafka:latest'
     container_name: kafka
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      # This is sometimes not part of examples and will cause an "Temporary failure in name resolution" when trying to reach kafka from the host!
+      # see: https://stackoverflow.com/questions/59899283/error-connecting-to-local-bitnami-docker-kafka-from-spring-boot-application
+      #- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT:kafka:9092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    networks:
+      - useless-net
+  producer1:
+    container_name: producer1
+    build: ./producer
+    depends_on:
+      kafka:
+        condition: service_started
+    networks:
+      - useless-net
+  indexer1:
+    container_name: indexer1
+    build: ./indexer
+    depends_on:
+      kafka:
+        condition: service_started
     networks:
       - useless-net
   # Opensearch container provides fast indexing and search
   opensearch:
-    image: opensearchproject/opensearch:latest # This should be the same image used for opensearch-node1 to avoid issues
+    image: opensearchproject/opensearch:latest
     container_name: opensearch
     environment:
       - cluster.name=opensearch-cluster
@@ -81,5 +73,8 @@ services:
 volumes:
   opensearch:
 
+# we create one network where all the containers will have access to each other
 networks:
   useless-net:
+    name: useless-net
+    driver: bridge
