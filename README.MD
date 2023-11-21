@@ -20,8 +20,9 @@ All components are decoupled and run in their own Docker containers. This should
 The producer creates fake blog posts and enques them in a kafka queue. The indexer is listening to that queue and sends those blog posts then to Opensearch for indexing. 
 
 ## Docker Containers
-### Python producer
-Creates fake blog posts and puts them on the Kafka `blog.new-blogpost` queue
+### Python producer1
+Creates fake blog posts every 2 seconds and puts them on the Kafka `blog.new-blogpost` queue. 
+If you would like to start this container multiple time, run the following command after you started the standard stack to start an additional instance `docker run -d --network=useless-net useless-infrastructure-producer1`.
 
 ### Python indexer
 Reads the `blog.new-blogpost` queue and sends the entry to OpenSearch for indexing
