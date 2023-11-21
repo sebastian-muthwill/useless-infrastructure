@@ -43,6 +43,9 @@ If you would like to play around with it, follow these steps:
 3. Run `docker compose build` from within the repo folder.
 4. Run `docker compose up`.
 
+If you encounter an error with starting the opensearch container you probably need to increase `vm.max_map_count` to 262144.
+See here for details: https://stackoverflow.com/questions/51445846/elasticsearch-max-virtual-memory-areas-vm-max-map-count-65530-is-too-low-inc
+
 Docker will now pull all the necessary images and run the whole useless thing. 
 
 ## Todo's
