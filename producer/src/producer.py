@@ -6,6 +6,7 @@ from confluent_kafka.admin import AdminClient
 import socket
 from time import sleep
 import logging
+from datetime import datetime
 
 # Container logs are not printed to stdout by default.
 # Therefor we need to configure logging to print to stdout.
@@ -44,6 +45,7 @@ while True:
         "author": fake.name(),
         "created_at": str(fake.date_time_this_decade()),
         "url": fake.url(),
+        "timestamp": datetime.now()
     }
 
     producer.produce('blog.new_blogpost', json.dumps(blog))
