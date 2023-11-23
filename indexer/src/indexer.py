@@ -64,11 +64,22 @@ while not client:
 try:
     index_name = 'blog-index'
     index_body = {
-    'settings': {
-        'index': {
-        'number_of_shards': 4
-        }
-    }
+        'settings': {
+            'index': {
+            'number_of_shards': 4
+            }
+        },
+        "mappings": {
+            "properties": {
+                "id": { "type" : "text" },
+                "title": { "type" : "text" },
+                "body": { "type" : "text" },
+                "author": { "type" : "text" },
+                "created_at": { "type" : "date" },
+                "url": { "type" : "text" },
+                "timestamp": { "type" : "date" },
+                }
+              }
     }
 
     response = client.indices.create(
@@ -78,7 +89,7 @@ try:
 
     logging.debug(response)
 except Exception as e:
-    pass
+    logging.error(e)
 
 while True:
     msg = consumer.poll(1.0)
