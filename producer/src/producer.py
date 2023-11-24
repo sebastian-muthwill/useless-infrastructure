@@ -43,9 +43,9 @@ while True:
         "title": fake.sentence(),
         "body": fake.text(800),
         "author": fake.name(),
-        "created_at": str(fake.date_time_this_decade()),
+        "created_at": fake.date_time_this_decade().strftime("%Y-%m-%dT%H:%M:%S.%f") ,                    # Opensearch expects fields with type 'date' to have this format
         "url": fake.url(),
-        "timestamp": datetime.now()
+        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")        # Opensearch expects fields with type 'date' to have this format
     }
 
     producer.produce('blog.new_blogpost', json.dumps(blog))
