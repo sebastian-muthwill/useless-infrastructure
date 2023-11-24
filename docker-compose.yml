@@ -16,18 +16,6 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    command: |
-      "
-      # blocks until kafka is reachable
-      kafka-topics --bootstrap-server kafka:9092 --list
-
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic blog.new_blogposts --replication-factor 1 --partitions 4
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic blog.second_topic --replication-factor 1 --partitions 4
-
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka:9092 --list
-      "
     networks:
       - useless-net
   kafka-ui:
@@ -43,6 +31,25 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     networks:
       - useless-net
+  init-kafka:
+    image: bitnami/kafka:latest
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:29092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic blog.new_blogposts --replication-factor 1 --partitions 4
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic blog.second_topic --replication-factor 1 --partitions 1
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
+    networks:
+      -useless-net
   producer1:
     container_name: producer1
     build: ./producer
