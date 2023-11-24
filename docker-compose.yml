@@ -16,7 +16,18 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_CREATE_TOPICS="blog.new_blogpost:1:4"
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:9092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic blog.new_blogposts --replication-factor 1 --partitions 4
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic blog.second_topic --replication-factor 1 --partitions 4
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:9092 --list
+      "
     networks:
       - useless-net
   kafka-ui:
