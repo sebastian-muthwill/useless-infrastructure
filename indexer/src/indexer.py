@@ -9,7 +9,10 @@ logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 logging.info("indexer container started")
 logging.info("Waiting for Kafka broker and Opensearch to be ready. Sleep for 20s.")
 
-kafka_conf = {'bootstrap.servers': 'kafka:9092', 'group.id': 'indexer-1'}
+kafka_conf = {
+    'bootstrap.servers': 'kafka:9092',
+    'group.id': 'indexer-1'    # when run multiple instances this groups them in one consumer group
+}
 
 host = 'opensearch'
 port = 9200
