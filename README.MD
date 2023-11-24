@@ -17,12 +17,13 @@ The architecture consists of:
 
 All components are decoupled and run in their own Docker containers. This should make it easy to run it locally. 
 
-The producer creates fake blog posts and enques them in a kafka queue. The indexer is listening to that queue and sends those blog posts then to Opensearch for indexing. 
+The producer creates fake blog posts and enques them in a kafka topic. The indexer is listening to that topic and sends those blog posts then to Opensearch for indexing. 
 
 ## Docker Containers
 ### Python producer1
-Creates fake blog posts every 2 seconds and puts them on the Kafka `blog.new-blogpost` queue. 
-If you would like to start this container multiple time, run the following command after you started the standard stack to start an additional instance `docker run -d --network=useless-net useless-infrastructure-producer1`.
+Creates fake blog posts every 2 seconds and puts them on the Kafka `blog.new-blogpost` topic. 
+You can start this container multiple time by running `docker run -d --network=useless-net useless-infrastructure-producer1` after you started the compose stack. This will increas the amount of items produced. 
+I could run 60 instances producing blog posts per second and puting them onto the topic.
 
 ### Python indexer
 Reads the `blog.new-blogpost` queue and sends the entry to OpenSearch for indexing
